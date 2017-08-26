@@ -9,8 +9,6 @@ import DateTime from 'grommet/components/DateTime';
 import Anchor from 'grommet/components/Anchor';
 import Spinning from 'grommet/components/icons/Spinning';
 import Label from 'grommet/components/Label';
-import Box from 'grommet/components/Box';
-import Button from 'grommet/components/Button';
 import Image from 'grommet/components/Image';
 import Form from 'grommet/components/Form';
 
