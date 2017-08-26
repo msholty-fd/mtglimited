@@ -9,6 +9,19 @@ import DateTime from 'grommet/components/DateTime';
 import Anchor from 'grommet/components/Anchor';
 import Button from 'grommet/components/Button';
 import Image from 'grommet/components/Image';
+import Spinning from 'grommet/components/icons/Spinning';
+import Label from 'grommet/components/Label';
+import Image from 'grommet/components/Image';
+import Form from 'grommet/components/Form';
+
+const style = {
+  aligner: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: '100%',
+  },
+};
 
 @firebaseConnect(ownProps => [
   `/quests/${ownProps.params.id}`,
@@ -56,74 +69,78 @@ class QuestPage extends React.Component {
     await this.props.firebase.set(`/quests/${this.props.params.id}/isComplete/`, true);
   }
 
+  handleFileUpload = (event) => {
+    const file = event.target.files[0];
+    this.props.firebase.uploadFile(`quests/${this.props.params.id}/thumbnail`, file)
+      .then((uploadedFile) => {
+        this.update('thumbnail', uploadedFile.metadata.downloadURLs[0]);
+      });
+  }
+
   render() {
-    const { quest, users } = this.props;
-    const uid = this.props.firebase.auth().currentUser.uid;
-    if (!quest || !users) {
-      return <h1>LOADING</h1>;
+    const { quest } = this.props;
+    if (!quest) {
+      return (
+        <div
+          style={style.aligner}
+        >
+          <div>
+            <Spinning
+              size="xlarge"
+            />
+          </div>
+        </div>
+      );
     }
     const party = quest.get('party', new Immutable.Map());
     const populatedParty = party.map(id => users.get(id));
     return (
       <div>
-        <h2>Quest Details Page </h2>
-        {!party.contains(uid) &&
-          <Button
-            label="Join This Quest"
-            onClick={() => this.joinQuest(uid)}
-            primary
-          />
-        }
-        {party.contains(uid) &&
-          <Button
-            label="Leave This Quest"
-            onClick={() => this.leaveQuest(party, uid)}
-            primary
-          />
-        }
-        <br />
-        Date: <DateTime
-          id="date"
-          name="name"
-          onChange={value => this.update('date', value)}
-          value={quest.get('date')}
-        /><br />
-        Location: <TextInput
-          id="location"
-          value={quest.get('location')}
-          onDOMChange={event => this.update('location', event.target.value)}
-        /><br />
-        Name: <TextInput
-          id="name"
-          value={quest.get('name')}
-          onDOMChange={event => this.update('name', event.target.value)}
+        <h2>{quest.get('name')}</h2>
+        <Image
+          src={quest.get('thumbnail')}
         />
         <br />
-        Users in this quest: <br />
-        {populatedParty.map(user => (
-          <Image
-            size="thumb"
-            src={user.get('avatarUrl')}
-            style={{ borderRadius: 12 }}
+        <Form
+          pad="small"
+        >
+          <Label>
+            Change Thumbnail
+          </Label>
+          <input type="file" onChange={this.handleFileUpload} />
+          <br />
+          <Label>
+            Date
+          </Label>
+          <DateTime
+            id="date"
+            name="name"
+            onChange={value => this.update('date', value)}
+            value={quest.get('date')}
+            align="right"
+          /><br />
+          <Label>
+            Location
+          </Label>
+          <TextInput
+            id="location"
+            value={quest.get('location')}
+            onDOMChange={event => this.update('location', event.target.value)}
+          /><br />
+          <Label>
+            Name
+          </Label>
+          <TextInput
+            id="name"
+            value={quest.get('name')}
+            onDOMChange={event => this.update('name', event.target.value)}
           />
-        ))}
-        <br />
-        {uid === quest.get('user') &&
-          <div>
-            {quest.get('isComplete') !== true &&
-              <Button
-                label="Complete Quest"
-                onClick={() => this.completeQuest(populatedParty)}
-                primary
-              />
-            }
-            <br />
-            <Anchor
-              label="Delete This Quest"
-              onClick={() => this.delete()}
-            />
-          </div>
-        }
+          <br />
+          <Anchor
+            label="Delete This Quest"
+            onClick={() => this.delete()}
+          />
+        </Form>
       </div>
     );
   }
