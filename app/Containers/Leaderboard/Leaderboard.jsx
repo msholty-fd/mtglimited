@@ -1,7 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
-import { browserHistory } from 'react-router';
 import { firebaseConnect } from 'react-redux-firebase';
 import { fromJS } from 'immutable';
 
@@ -60,7 +59,7 @@ export default class Leaderboard extends React.Component {
           </Heading>
           <List>
             {userScores.map(user => (
-              <ListItem key={user.userKey} onClick={() => browserHistory.push(`/users/${user.userKey}`)}>
+              <ListItem>
                 <Box
                   direction="row"
                   justify="start"
