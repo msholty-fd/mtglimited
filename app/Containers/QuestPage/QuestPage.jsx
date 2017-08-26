@@ -162,10 +162,22 @@ class QuestPage extends React.Component {
             />
           ))}
           <br />
-          <Anchor
-            label="Delete This Quest"
-            onClick={() => this.delete()}
-          />
+          {uid === quest.get('user') &&
+            <div>
+              {quest.get('isComplete') !== true &&
+                <Button
+                  label="Complete Quest"
+                  onClick={() => this.completeQuest(populatedParty)}
+                  primary
+                />
+              }
+              <br />
+              <Anchor
+                label="Delete This Quest"
+                onClick={() => this.delete()}
+              />
+            </div>
+          }
         </Form>
       </div>
     );
