@@ -98,6 +98,27 @@ class Dashboard extends React.Component {
           justify="start"
         >
           <Tab
+            title="All"
+          >
+            <div>
+              <Tiles>
+                {quests.count() === 0 &&
+                  <p>You have no quests. Create one now.</p>
+                }
+                {quests.map((quest, id) => (
+                  <Tile>
+                    <Card
+                      key={id} // eslint-disable-line
+                      thumbnail={quest.get('thumbnail')}
+                      label={quest.get('name')}
+                      onClick={() => browserHistory.push(`/quests/${id}`)}
+                    />
+                  </Tile>
+                )).valueSeq()}
+              </Tiles>
+            </div>
+          </Tab>
+          <Tab
             title="Created"
           >
             <div>
