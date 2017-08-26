@@ -60,7 +60,7 @@ export default class Leaderboard extends React.Component {
           </Heading>
           <List>
             {userScores.map(user => (
-              <ListItem key={user.userKey} onClick={() => browserHistory.push(`/users/${user.userKey}`)}>
+              <ListItem>
                 <Box
                   direction="row"
                   justify="start"
