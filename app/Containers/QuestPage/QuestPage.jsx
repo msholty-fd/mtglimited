@@ -11,7 +11,6 @@ import Button from 'grommet/components/Button';
 import Image from 'grommet/components/Image';
 import Spinning from 'grommet/components/icons/Spinning';
 import Label from 'grommet/components/Label';
-import Image from 'grommet/components/Image';
 import Form from 'grommet/components/Form';
 
 const style = {
@@ -78,8 +77,8 @@ class QuestPage extends React.Component {
   }
 
   render() {
-    const { quest } = this.props;
-    if (!quest) {
+    const { quest, users } = this.props;
+    if (!quest || !users) {
       return (
         <div
           style={style.aligner}
@@ -94,9 +93,26 @@ class QuestPage extends React.Component {
     }
     const party = quest.get('party', new Immutable.Map());
     const populatedParty = party.map(id => users.get(id));
+    const uid = this.props.firebase.auth().currentUser.uid;
+
     return (
       <div>
         <h2>{quest.get('name')}</h2>
+        {!party.contains(uid) &&
+          <Button
+            label="Join This Quest"
+            onClick={() => this.joinQuest(uid)}
+            primary
+          />
+        }
+        {party.contains(uid) &&
+          <Button
+            label="Leave This Quest"
+            onClick={() => this.leaveQuest(party, uid)}
+            primary
+          />
+        }
+        <br />
         <Image
           src={quest.get('thumbnail')}
         />
@@ -135,6 +151,16 @@ class QuestPage extends React.Component {
             value={quest.get('name')}
             onDOMChange={event => this.update('name', event.target.value)}
           />
+          <br />
+          Users in this quest:
+          <br />
+          {populatedParty.map(user => (
+            <Image
+              size="thumb"
+              src={user.get('avatarUrl')}
+              style={{ borderRadius: 12 }}
+            />
+          ))}
           <br />
           <Anchor
             label="Delete This Quest"
