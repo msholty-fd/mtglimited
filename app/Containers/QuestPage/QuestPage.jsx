@@ -7,6 +7,19 @@ import { browserHistory } from 'react-router';
 import TextInput from 'grommet/components/TextInput';
 import DateTime from 'grommet/components/DateTime';
 import Anchor from 'grommet/components/Anchor';
+import Spinning from 'grommet/components/icons/Spinning';
+import Label from 'grommet/components/Label';
+import Image from 'grommet/components/Image';
+import Form from 'grommet/components/Form';
+
+const style = {
+  aligner: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: '100%',
+  },
+};
 
 @firebaseConnect(ownProps => [
   `/quests/${ownProps.params.id}`,
@@ -30,35 +43,76 @@ class QuestPage extends React.Component {
     browserHistory.push('/dashboard');
   }
 
+  handleFileUpload = (event) => {
+    const file = event.target.files[0];
+    this.props.firebase.uploadFile(`quests/${this.props.params.id}/thumbnail`, file)
+      .then((uploadedFile) => {
+        this.update('thumbnail', uploadedFile.metadata.downloadURLs[0]);
+      });
+  }
+
   render() {
     const { quest } = this.props;
     if (!quest) {
-      return <h1>LOADING</h1>;
+      return (
+        <div
+          style={style.aligner}
+        >
+          <div>
+            <Spinning
+              size="xlarge"
+            />
+          </div>
+        </div>
+      );
     }
     return (
       <div>
-        <h2>Quest Details Page </h2>
-        Date: <DateTime
-          id="date"
-          name="name"
-          onChange={value => this.update('date', value)}
-          value={quest.get('date')}
-        /><br />
-        Location: <TextInput
-          id="location"
-          value={quest.get('location')}
-          onDOMChange={event => this.update('location', event.target.value)}
-        /><br />
-        Name: <TextInput
-          id="name"
-          value={quest.get('name')}
-          onDOMChange={event => this.update('name', event.target.value)}
+        <h2>{quest.get('name')}</h2>
+        <Image
+          src={quest.get('thumbnail')}
         />
         <br />
-        <Anchor
-          label="Delete This Quest"
-          onClick={() => this.delete()}
-        />
+        <Form
+          pad="small"
+        >
+          <Label>
+            Change Thumbnail
+          </Label>
+          <input type="file" onChange={this.handleFileUpload} />
+          <br />
+          <Label>
+            Date
+          </Label>
+          <DateTime
+            id="date"
+            name="name"
+            onChange={value => this.update('date', value)}
+            value={quest.get('date')}
+            align="right"
+          /><br />
+          <Label>
+            Location
+          </Label>
+          <TextInput
+            id="location"
+            value={quest.get('location')}
+            onDOMChange={event => this.update('location', event.target.value)}
+          /><br />
+          <Label>
+            Name
+          </Label>
+          <TextInput
+            id="name"
+            value={quest.get('name')}
+            onDOMChange={event => this.update('name', event.target.value)}
+          />
+          <br />
+          <Anchor
+            label="Delete This Quest"
+            onClick={() => this.delete()}
+          />
+        </Form>
       </div>
     );
   }
