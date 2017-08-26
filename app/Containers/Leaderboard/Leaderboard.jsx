@@ -62,9 +62,7 @@ export default class Leaderboard extends React.Component {
               <ListItem>
                 <Box
                   direction="row"
-                  justify="start"
-                  align="center"
-                  wrap="true"
+                  alignContents="center"
                 >
                   <Image
                     size="thumb"

@@ -46,6 +46,16 @@ class QuestPage extends React.Component {
     console.log('left party');
   }
 
+  completeQuest = async (party) => {
+    party.forEach((user) => {
+      this.props.firebase.push('/experience', {
+        score: Math.floor(Math.random() * 100) + 1,
+        user: user.get('uid'),
+      });
+    });
+    await this.props.firebase.set(`/quests/${this.props.params.id}/isComplete/`, true);
+  }
+
   render() {
     const { quest, users } = this.props;
     const uid = this.props.firebase.auth().currentUser.uid;
@@ -99,10 +109,20 @@ class QuestPage extends React.Component {
         ))}
         <br />
         {uid === quest.get('user') &&
-          <Anchor
-            label="Delete This Quest"
-            onClick={() => this.delete()}
-          />
+          <div>
+            {quest.get('isComplete') !== true &&
+              <Button
+                label="Complete Quest"
+                onClick={() => this.completeQuest(populatedParty)}
+                primary
+              />
+            }
+            <br />
+            <Anchor
+              label="Delete This Quest"
+              onClick={() => this.delete()}
+            />
+          </div>
         }
       </div>
     );
